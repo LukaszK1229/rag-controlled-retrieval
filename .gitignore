@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+
+# Local data / generated artifacts
+rag.db
+faiss.index
+faiss_meta.pkl
+embeddings.json
+embeddings_ingested.json
+
+# Local folders
+archives/
+backup/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
