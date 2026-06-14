@@ -65,7 +65,7 @@ class FaissVectorStore:
 
             results.append({
                 "chunk_id": self.id_map[idx],
-                "score": float(dist)  # UWAGA: to jest dystans (im mniejszy tym lepiej)
+                "score": float(dist)  
             })
 
         return results
