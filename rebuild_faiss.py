@@ -90,10 +90,10 @@ def main():
     with sqlite3.connect(DB_PATH) as conn:
         active_chunk_ids = load_active_chunk_ids(conn)
 
-        # tylko te, które:
-        # - są aktywne w DB
-        # - mają embedding
-        # - NIE SĄ jeszcze w FAISS
+        
+        
+        
+        
         to_add = [
             cid for cid in active_chunk_ids
             if cid in embeddings and cid not in already_indexed
