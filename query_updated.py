@@ -27,9 +27,9 @@ EMBED_MODEL = "text-embedding-3-small"
 EMBED_URL = "https://openrouter.ai/api/v1/embeddings"
 
 TOP_K = 5
-FETCH_K = 50  # pobieramy więcej z FAISS, filtrujemy metadata, potem tniemy do TOP_K
-SCORE_THRESHOLD = 0.85  # UWAGA: dystans L2 (im mniejszy, tym lepiej)
-SCORE_GAP_THRESHOLD = 0.05  # L2: top2 - top1; mały gap = retriever mniej pewny
+FETCH_K = 50  
+SCORE_THRESHOLD = 0.85 
+SCORE_GAP_THRESHOLD = 0.05  
 
 load_dotenv()
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -61,14 +61,7 @@ def get_allowed_chunk_ids(
     doc_types: list[str] | None = None,
     user_role: str | None = None,
 ) -> set[str]:
-    """
-    Zwraca zbiór chunk_id, które:
-    - są aktywne
-    - należą do aktywnego dokumentu
-    - są w oknie ważności (valid_from / valid_to)
-    - pasują do doc_type (opcjonalnie)
-    - pasują do role_scope (opcjonalnie)
-    """
+
 
     base_query = """
         SELECT c.chunk_id
@@ -234,7 +227,7 @@ def retrieve(state: QueryState, top_k: int, fetch_k: int = FETCH_K) -> QueryStat
 
     store = get_vector_store()
 
-    # [ETAP 2] metadata pre-filter
+    
     with sqlite3.connect(DB_PATH) as conn:
         allowed_chunk_ids = get_allowed_chunk_ids(
             conn,
@@ -242,7 +235,7 @@ def retrieve(state: QueryState, top_k: int, fetch_k: int = FETCH_K) -> QueryStat
             user_role="public"
         )
 
-    # Pobieramy więcej wyników z FAISS, bo część może odpaść po metadata filter.
+   
     raw = store.search(state.embedding, k=fetch_k)
 
     filtered = [
@@ -333,15 +326,14 @@ def decide(
         state.stop_reason = "no_retrieval_results"
         return state
 
-    # L2 distance: im mniejszy score, tym lepszy wynik.
+    
     top_score = state.retrieval_results[0].score
 
     if top_score > score_threshold:
         state.stop_reason = "low_confidence"
         return state
 
-    # Drugi sygnał: czy top-1 wyraźnie wygrywa z top-2.
-    # Jeśli różnica jest mała, retriever może być niepewny.
+    
     if len(state.retrieval_results) >= 2:
         second_score = state.retrieval_results[1].score
         score_gap = second_score - top_score
@@ -463,7 +455,7 @@ def run_query(question: str):
     state = embed(state)
     state = retrieve(state, top_k=TOP_K)
 
-    # [OBS] log top-k FAISS + snippety do debugowania jakości retrievalu
+   
     if state.retrieval_results:
         chunk_ids = [r.chunk_id for r in state.retrieval_results]
         snippets = get_chunk_snippets(chunk_ids)
