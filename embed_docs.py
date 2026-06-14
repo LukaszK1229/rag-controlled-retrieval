@@ -38,7 +38,7 @@ for filename in os.listdir(DOCS_DIR):
     with open(path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # JEDYNY delimiter – zgodnie z tym, co miałeś OD POCZĄTKU
+    
     parts = content.split("##")
 
     chunk_index = 0
@@ -58,7 +58,7 @@ for filename in os.listdir(DOCS_DIR):
         if not text:
             continue
 
-        # STABILNY HASH TREŚCI (POD SQL)
+        
         content_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
 
         embedding = embed_text(text)
